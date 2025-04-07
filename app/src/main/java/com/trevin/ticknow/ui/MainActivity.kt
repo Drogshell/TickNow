@@ -1,8 +1,7 @@
-package com.trevin.ticknow
+package com.trevin.ticknow.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import com.trevin.ticknow.data.Task
 import com.trevin.ticknow.data.TaskDao
@@ -20,6 +18,8 @@ import com.trevin.ticknow.databinding.ActivityMainBinding
 import com.trevin.ticknow.databinding.DialogAddTaskBinding
 import kotlin.concurrent.thread
 import androidx.core.view.isVisible
+import com.trevin.ticknow.R
+import com.trevin.ticknow.ui.tasks.TasksFragment
 
 class MainActivity : AppCompatActivity() {
 
