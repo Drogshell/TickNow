@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var database: TickNowDatabase
     private val taskDao: TaskDao by lazy { database.getTaskDao() }
+    private val tasksFragment: TasksFragment = TasksFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             showAddTaskDialog()
         }
 
-        database = TickNowDatabase.createDatabase(this)
+        database = TickNowDatabase.getDatabase(this)
 
     }
 
@@ -68,13 +69,14 @@ class MainActivity : AppCompatActivity() {
                 taskDao.createTask(task)
             }
             dialog.dismiss()
+            tasksFragment.fetchAllTasks()
         }
         dialog.show()
     }
 
     inner class SwipePageAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
         override fun createFragment(position: Int): Fragment {
-            return TasksFragment()
+            return tasksFragment
         }
 
         override fun getItemCount(): Int {

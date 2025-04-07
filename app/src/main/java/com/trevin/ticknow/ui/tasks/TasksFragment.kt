@@ -6,11 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.trevin.ticknow.data.Task
+import com.trevin.ticknow.data.TaskDao
+import com.trevin.ticknow.data.TickNowDatabase
 import com.trevin.ticknow.databinding.FragmentTasksBinding
+import kotlin.concurrent.thread
 
-class TasksFragment : Fragment() {
+class TasksFragment : Fragment(), TasksAdapter.TaskUpdatedListener {
 
     private lateinit var binding: FragmentTasksBinding
+
+    private val taskDao: TaskDao by lazy {
+        TickNowDatabase.getDatabase(requireContext()).getTaskDao()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,14 +29,23 @@ class TasksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Dummy code to see if the recycler view is working
-        binding.recyclerView.adapter = TasksAdapter(
-            tasks = listOf(
-                Task(title = "first test task", description = "Fake dummy description"),
-                Task(title = "second test task", description = "Fake dummy dummy description"),
-                Task(title = "third test task", description = "Fake dummy dummy dummy description")
-            )
-        )
+        fetchAllTasks()
+    }
+
+    fun fetchAllTasks() {
+        thread {
+            val tasks = taskDao.getAllTasks()
+            requireActivity().runOnUiThread {
+                binding.recyclerView.adapter = TasksAdapter(tasks = tasks, listener = this)
+            }
+        }
+    }
+
+    override fun onTaskUpdated(task: Task) {
+        thread {
+            taskDao.updateTask(task)
+            fetchAllTasks()
+        }
     }
 
 }
