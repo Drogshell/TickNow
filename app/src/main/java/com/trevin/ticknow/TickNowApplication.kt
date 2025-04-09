@@ -1,21 +1,21 @@
 package com.trevin.ticknow
 
 import android.app.Application
-import com.trevin.ticknow.data.TaskDao
-import com.trevin.ticknow.data.TickNowDatabase
+import com.trevin.ticknow.data.TaskRepository
+import com.trevin.ticknow.data.database.TickNowDatabase
 
 class TickNowApplication : Application() {
 
     // One time application global set up
     override fun onCreate() {
         super.onCreate()
-        database = TickNowDatabase.getDatabase(this)
-        taskDao = database.getTaskDao()
+        val database = TickNowDatabase.getDatabase(this)
+        val taskDao = database.getTaskDao()
+        taskRepository = TaskRepository(taskDao)
     }
 
     companion object {
-        lateinit var database: TickNowDatabase
-        lateinit var taskDao: TaskDao
+        lateinit var taskRepository: TaskRepository
     }
 
 }

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.trevin.ticknow.data.Task
+import com.trevin.ticknow.data.model.Task
 import com.trevin.ticknow.databinding.ItemTaskBinding
 
 class TasksAdapter(private val listener: TaskItemClickListener) :

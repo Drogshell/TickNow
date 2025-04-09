@@ -2,9 +2,11 @@ package com.trevin.ticknow.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -24,14 +26,20 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel : MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private val tasksFragment: TasksFragment = TasksFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
             pager.adapter = SwipePageAdapter(this@MainActivity)
-            TabLayoutMediator(tabs, pager) { tab, _ ->
-                tab.text = "Tasks"
+            pager.currentItem = 1
+            TabLayoutMediator(tabs, pager) { tab, position ->
+                when (position){
+                    0 -> tab.icon = ContextCompat.getDrawable(this@MainActivity, R.drawable.ic_star_filled)
+                    1 -> tab.text = "Tasks"
+                    2 -> tab.customView = Button(this@MainActivity).apply {
+                        text = "Add new list"
+                    }
+                }
             }.attach()
             fab.setOnClickListener {
                 showAddTaskDialog()
@@ -63,7 +71,6 @@ class MainActivity : AppCompatActivity() {
             buttonSaveTask.setOnClickListener {
                 viewModel.createTask(title = editTextTaskTitle.text.toString(), description = editTextTaskDetails.text.toString())
                 dialog.dismiss()
-                tasksFragment.fetchAllTasks()
             }
             dialog.show()
         }
@@ -71,11 +78,11 @@ class MainActivity : AppCompatActivity() {
 
     inner class SwipePageAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
         override fun createFragment(position: Int): Fragment {
-            return tasksFragment
+            return TasksFragment()
         }
 
         override fun getItemCount(): Int {
-            return 1
+            return 3
         }
     }
 }
