@@ -5,19 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.trevin.ticknow.data.Task
-import com.trevin.ticknow.data.TaskDao
-import com.trevin.ticknow.data.TickNowDatabase
 import com.trevin.ticknow.databinding.FragmentTasksBinding
-import kotlin.concurrent.thread
+import com.trevin.ticknow.ui.TasksViewModel
 
-class TasksFragment : Fragment(), TasksAdapter.TaskUpdatedListener {
+class TasksFragment : Fragment(), TasksAdapter.TaskItemClickListener {
 
+    private val viewModel: TasksViewModel by viewModels()
     private lateinit var binding: FragmentTasksBinding
-
-    private val taskDao: TaskDao by lazy {
-        TickNowDatabase.getDatabase(requireContext()).getTaskDao()
-    }
+    private val adapter = TasksAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,23 +26,26 @@ class TasksFragment : Fragment(), TasksAdapter.TaskUpdatedListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.adapter = adapter
         fetchAllTasks()
     }
 
     fun fetchAllTasks() {
-        thread {
-            val tasks = taskDao.getAllTasks()
+        // This is very messy. Need to instead switch to Coroutines, so far Java threads have been
+        // fine to use but there's always something better.
+        viewModel.fetchTasks {
             requireActivity().runOnUiThread {
-                binding.recyclerView.adapter = TasksAdapter(tasks = tasks, listener = this)
+                adapter.setTasks(it)
             }
         }
     }
 
     override fun onTaskUpdated(task: Task) {
-        thread {
-            taskDao.updateTask(task)
-            fetchAllTasks()
-        }
+        viewModel.updateTask(task)
+    }
+
+    override fun onTaskDeleted(task: Task) {
+        viewModel.deleteTask(task)
     }
 
 }

@@ -3,75 +3,70 @@ package com.trevin.ticknow.ui
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayoutMediator
-import com.trevin.ticknow.data.Task
-import com.trevin.ticknow.data.TaskDao
-import com.trevin.ticknow.data.TickNowDatabase
+import com.trevin.ticknow.R
 import com.trevin.ticknow.databinding.ActivityMainBinding
 import com.trevin.ticknow.databinding.DialogAddTaskBinding
-import kotlin.concurrent.thread
-import androidx.core.view.isVisible
-import com.trevin.ticknow.R
 import com.trevin.ticknow.ui.tasks.TasksFragment
+import com.trevin.ticknow.util.InputValidator
 
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel : MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var database: TickNowDatabase
-    private val taskDao: TaskDao by lazy { database.getTaskDao() }
     private val tasksFragment: TasksFragment = TasksFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater).apply {
+            pager.adapter = SwipePageAdapter(this@MainActivity)
+            TabLayoutMediator(tabs, pager) { tab, _ ->
+                tab.text = "Tasks"
+            }.attach()
+            fab.setOnClickListener {
+                showAddTaskDialog()
+            }
+            setContentView(root)
+        }
         enableEdgeToEdge()
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        binding.pager.adapter = SwipePageAdapter(this)
-        TabLayoutMediator(binding.tabs, binding.pager) { tab, position ->
-            tab.text = "Tasks"
-        }.attach()
-
-        binding.fab.setOnClickListener {
-            showAddTaskDialog()
-        }
-
-        database = TickNowDatabase.getDatabase(this)
-
     }
 
     private fun showAddTaskDialog() {
-        val dialogBinding = DialogAddTaskBinding.inflate(layoutInflater)
-        val dialog = BottomSheetDialog(this)
-        dialog.setContentView(dialogBinding.root)
-        dialogBinding.buttonShowDetails.setOnClickListener {
-            dialogBinding.editTextTaskDetails.visibility =
-                if (dialogBinding.editTextTaskDetails.isVisible) View.GONE else View.VISIBLE
-        }
-        dialogBinding.buttonSaveTask.setOnClickListener {
-            val task = Task(
-                title = dialogBinding.editTextTaskTitle.text.toString(),
-                description = dialogBinding.editTextTaskDetails.text.toString()
-            )
-            thread {
-                taskDao.createTask(task)
+        DialogAddTaskBinding.inflate(layoutInflater).apply {
+            val dialog = BottomSheetDialog(this@MainActivity)
+            dialog.setContentView(root)
+
+            buttonSaveTask.isEnabled = false
+            editTextTaskTitle.addTextChangedListener{ input ->
+                buttonSaveTask.isEnabled = InputValidator.isValidInput(input)
             }
-            dialog.dismiss()
-            tasksFragment.fetchAllTasks()
+
+            buttonShowDetails.setOnClickListener {
+                editTextTaskDetails.visibility =
+                    if (editTextTaskDetails.isVisible) View.GONE else View.VISIBLE
+            }
+            buttonSaveTask.setOnClickListener {
+                viewModel.createTask(title = editTextTaskTitle.text.toString(), description = editTextTaskDetails.text.toString())
+                dialog.dismiss()
+                tasksFragment.fetchAllTasks()
+            }
+            dialog.show()
         }
-        dialog.show()
     }
 
     inner class SwipePageAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
