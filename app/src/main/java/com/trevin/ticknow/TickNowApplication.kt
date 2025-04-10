@@ -11,7 +11,8 @@ class TickNowApplication : Application() {
         super.onCreate()
         val database = TickNowDatabase.getDatabase(this)
         val taskDao = database.getTaskDao()
-        taskRepository = TaskRepository(taskDao)
+        val taskListDao = database.getTaskListDao()
+        taskRepository = TaskRepository(taskDao, taskListDao)
     }
 
     companion object {

@@ -13,18 +13,12 @@ class StarredTasksViewModel : ViewModel() {
     private val repository: TaskRepository = TickNowApplication.Companion.taskRepository
 
     fun fetchTasks(): Flow<List<Task>> {
-        return repository.getAllTasks()
+        return repository.getStarredTasks()
     }
 
     fun updateTask(task: Task) {
         viewModelScope.launch {
             repository.updateTask(task)
-        }
-    }
-
-    fun deleteTask(task: Task) {
-        viewModelScope.launch {
-            repository.deleteTask(task)
         }
     }
 }

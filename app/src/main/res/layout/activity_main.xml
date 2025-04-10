@@ -36,10 +36,10 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
-            app:tabGravity="start"
-            app:tabMode="scrollable"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:tabGravity="start"
+            app:tabMode="scrollable" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -56,6 +56,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="36dp"
         android:src="@drawable/ic_add_task"
+        app:backgroundTint="@color/FederalBlue"
+        app:rippleColor="@color/PhotoBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

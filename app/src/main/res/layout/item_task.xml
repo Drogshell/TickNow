@@ -23,7 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:textSize="17sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/check_box"
         app:layout_constraintTop_toTopOf="parent"
@@ -39,8 +39,20 @@
         app:layout_constraintEnd_toEndOf="@id/text_view_title"
         app:layout_constraintStart_toStartOf="@id/text_view_title"
         app:layout_constraintTop_toBottomOf="@id/text_view_title"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/text_view_date"
         tools:text="Task Details" />
+
+    <TextView
+        android:id="@+id/text_view_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@id/text_view_details"
+        app:layout_constraintStart_toStartOf="@id/text_view_details"
+        app:layout_constraintTop_toBottomOf="@id/text_view_details"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="29/05/1998" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/toggle_star"

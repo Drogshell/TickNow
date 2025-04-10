@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.trevin.ticknow.data.model.Task
 import com.trevin.ticknow.databinding.ItemTaskBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TasksAdapter(private val listener: TaskItemClickListener) :
     RecyclerView.Adapter<TasksAdapter.ViewHolder>() {
@@ -46,10 +48,8 @@ class TasksAdapter(private val listener: TaskItemClickListener) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(task: Task) {
             binding.apply {
-                // This is temporary until I handle proper deletion on a separate activity
-                this.root.setOnLongClickListener {
-                    listener.onTaskDeleted(task)
-                    true
+                this.root.setOnClickListener {
+                    listener.onTaskClicked(task)
                 }
 
                 checkBox.isChecked = task.isComplete
@@ -74,6 +74,13 @@ class TasksAdapter(private val listener: TaskItemClickListener) :
                     textViewDetails.visibility = View.VISIBLE
                 }
 
+                if (task.dueDate == null){
+                    textViewDate.visibility = View.GONE
+                } else {
+                    textViewDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(task.dueDate)
+                    textViewDate.visibility = View.VISIBLE
+                }
+
                 checkBox.setOnClickListener {
                     val updatedTask = task.copy(isComplete = checkBox.isChecked)
                     listener.onTaskUpdated(updatedTask)
@@ -89,6 +96,6 @@ class TasksAdapter(private val listener: TaskItemClickListener) :
     // Interfaces allow for communication between a recycler view and a fragment or activity
     interface TaskItemClickListener {
         fun onTaskUpdated(task: Task)
-        fun onTaskDeleted(task: Task)
+        fun onTaskClicked(task: Task)
     }
 }

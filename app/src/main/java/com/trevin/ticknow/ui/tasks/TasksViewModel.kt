@@ -12,8 +12,8 @@ class TasksViewModel : ViewModel() {
 
     private val repository: TaskRepository = TickNowApplication.Companion.taskRepository
 
-    fun fetchTasks(): Flow<List<Task>> {
-        return repository.getAllTasks()
+    fun fetchTasks(taskListID: Int): Flow<List<Task>> {
+        return repository.getAllTasks(taskListID)
     }
 
     fun updateTask(task: Task) {
